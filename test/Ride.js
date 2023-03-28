@@ -41,27 +41,39 @@ describe("Ride", function () {
             );
         });
 
-        it("Add passnger fails if the ride is already started", async function () {
+        it("Add passenger succeeds if the price is paid", async function () {
             const { ride, rider } = await loadFixture(deployRideContract);
-            const encodedFunctionCall = ride.methods.addPassenger(rider.address).encodeABI();
-            const gas = await ride.methods.addPassenger(rider.address).estimateGas({ from: riderAddress });
-            const transactionObject = {
-                from: riderAddress,
-                to: rideAddress,
-                gas: gas,
-                data: encodedFunctionCall
-                
-            };
-
-            const receipt = await web3.eth.sendTransaction(transactionObject);
-
-            await ride.addPassenger(rider.address, { value: ONE_GWEI });
-            // rider starts the ride
-            await rider.sendTransaction({ to: ride.address, value: ONE_GWEI, gasLimit: 31000 });
-            await expect(ride.addPassenger(rider.address, { value: ONE_GWEI })).to.be.revertedWith(
-                "Ride already started"
+            await expect(ride.addPassenger(rider.address, { value: price })).to.emit(
+                ride,
+                "PassengerAdded"
             );
         });
+
+        it("Add passnger fails if already added", async function () {
+            const { ride, rider } = await loadFixture(deployRideContract);
+            await expect(ride.addPassenger(rider.address, { value: price })).to.emit(
+                ride,
+                "PassengerAdded"
+            );
+            await expect(ride.addPassenger(rider.address, { value: price })).to.be.revertedWith(
+                "Passenger already added"
+            );
+
+        });
+
+        it("Add passenger fails if the ride is already started", async function () {
+            const { ride, rider } = await loadFixture(deployRideContract);
+            await expect(ride.addPassenger(rider.address, { value: price })).to.emit(
+                ride,
+                "PassengerAdded"
+            );
+            await expect(ride.connect(rider).startRide()).to.emit(ride, "RideStarted");
+            await expect(ride.connect(rider).startRide()).to.be.revertedWith(
+                "Ride already started"
+            );
+        }
+        );
+
     });
 
 });

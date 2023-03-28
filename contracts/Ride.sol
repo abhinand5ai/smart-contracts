@@ -12,6 +12,9 @@ contract Ride {
     uint256 rideStartTime;
     uint256 rideEndTime;
 
+    event PassengerAdded(address passenger);
+    event RideStarted(uint256 rideStartTime);
+
     // constructor with the price of the ride and the owner of the ride and driver
     constructor(uint256 _price, address _driver) {
         owner = msg.sender;
@@ -23,16 +26,20 @@ contract Ride {
     // take money deposit from the passenger. check if enough and send it to the owner
     function addPassenger(address _passenger) public payable {
         require(msg.value >= price, "Not enough money");
+        require(passenger == address(0), "Passenger already added");
         require(!rideStarted, "Ride already started");
         passenger = _passenger;
         payable(owner).transfer(msg.value);
+        emit PassengerAdded(passenger);
     }
 
     // function to start the ride by passenger
     function startRide() public {
         require(msg.sender == passenger, "Only passenger can start the ride");
+        require(!rideStarted, "Ride already started");
         rideStarted = true;
         rideStartTime = block.timestamp;
+        emit RideStarted(rideStartTime);
     }
 
     // function to end the ride by passenger and validate the ride
