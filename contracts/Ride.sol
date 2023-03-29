@@ -1,6 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+contract RideFactory {
+    address[] public rides;
+
+    event RideCreated(address ride);
+    constructor() {}
+    function createRide(uint256 _price, address _driver) public {
+        address newRide = address(new Ride(msg.sender, _price, _driver));
+        rides.push(newRide);
+        emit RideCreated(newRide);
+    }
+
+    function getRides() public view returns (address[] memory) {
+        return rides;
+    }
+}
+
 contract Ride {
     address public owner;
     address public driver;
@@ -16,8 +32,8 @@ contract Ride {
     event RideStarted(uint256 rideStartTime);
 
     // constructor with the price of the ride and the owner of the ride and driver
-    constructor(uint256 _price, address _driver) {
-        owner = msg.sender;
+    constructor(address _owner, uint256 _price, address _driver) {
+        owner = _owner;
         driver = _driver;
         price = _price;
     }
