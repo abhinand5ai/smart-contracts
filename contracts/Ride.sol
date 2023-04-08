@@ -92,3 +92,7 @@ contract Ride {
         destinationReached = true;
     }
 }
+
+
+// latest deployment 
+// Ride deployed to: 0xF1aAB2FA4Fe71A780Ff039223eA3a18b9Fb0c7CE

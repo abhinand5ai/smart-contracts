@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run scripts/deploy.js --network rinkeby"
+    "deploy": "npx hardhat run scripts/deploy.js --network goerli",
+    "compile": "npx hardhat compile"
+
   },
   "keywords": [],
   "author": "",
