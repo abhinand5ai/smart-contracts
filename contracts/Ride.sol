@@ -5,9 +5,18 @@ contract RideFactory {
     address[] public rides;
 
     event RideCreated(address ride);
+
     constructor() {}
-    function createRide(uint256 _price, address _driver) public returns (address) {
-        address newRide = address(new Ride(msg.sender, _price, _driver));
+
+    function createRide(
+        uint256 _price,
+        address _driver,
+        string calldata origin,
+        string calldata desitnation
+    ) public returns (address) {
+        address newRide = address(
+            new Ride(msg.sender, _price, _driver, origin, desitnation)
+        );
         rides.push(newRide);
         emit RideCreated(newRide);
         return newRide;
@@ -28,15 +37,25 @@ contract Ride {
     bool rideStarted;
     uint256 rideStartTime;
     uint256 rideEndTime;
+    string public origin;
+    string public destination;
 
     event PassengerAdded(address passenger);
     event RideStarted(uint256 rideStartTime);
 
     // constructor with the price of the ride and the owner of the ride and driver
-    constructor(address _owner, uint256 _price, address _driver) {
+    constructor(
+        address _owner,
+        uint256 _price,
+        address _driver,
+        string memory _origin,
+        string memory _destination
+    ) {
         owner = _owner;
         driver = _driver;
         price = _price;
+        origin = _origin;
+        destination = _destination;
     }
 
     // function to add a passenger to the ride and

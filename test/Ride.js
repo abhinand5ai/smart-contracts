@@ -5,6 +5,8 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
+const origin = "Tanuku";
+const destination = "Hyderabad";
 
 describe("Ride", function () {
     const ONE_GWEI = 1_000_000_000;
@@ -13,7 +15,7 @@ describe("Ride", function () {
 
         const [owner, driver, rider] = await ethers.getSigners();
         const Ride = await ethers.getContractFactory("Ride");
-        const ride = await Ride.deploy(owner.address, price, driver.address);
+        const ride = await Ride.deploy(owner.address, price, driver.address, origin, destination);
         return { ride, price, owner, driver, rider };
     }
 
@@ -30,6 +32,8 @@ describe("Ride", function () {
             expect(await ride.price()).to.equal(price);
             expect(await ride.owner()).to.equal(owner.address);
             expect(await ride.driver()).to.equal(driver.address);
+            expect(await ride.origin()).to.equal(origin);
+            expect(await ride.destination()).to.equal(destination);
         });
 
         it("Owner should be the person who deployed the contract", async function () {
@@ -92,15 +96,17 @@ describe("Ride", function () {
 
             await expect(rideFactory
                 .connect(owner)
-                .createRide(price, driver.address))
+                .createRide(price, driver.address, origin, destination))
                 .to.emit(rideFactory, "RideCreated");
 
             const rideAddress = await rideFactory.rides(0);
             const ride = await ethers.getContractAt("Ride", rideAddress);
- 
+
             expect(await ride.price()).to.equal(price);
             expect(await ride.owner()).to.equal(owner.address);
             expect(await ride.driver()).to.equal(driver.address);
+            expect(await ride.origin()).to.equal(origin);
+            expect(await ride.destination()).to.equal(destination);
             await expect(ride.addPassenger(rider.address, { value: price })).to.emit(
                 ride,
                 "PassengerAdded"
